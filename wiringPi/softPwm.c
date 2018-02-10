@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <pthread.h>
+#include <time.h>
 
 #include "wiringPi.h"
 #include "softPwm.h"
@@ -49,7 +50,7 @@
 //	Another way to increase the frequency is to reduce the range - however
 //	that reduces the overall output accuracy...
 
-#define	PULSE_TIME	100
+#define	PULSE_TIME	1000  // [ns]
 
 static int marks         [MAX_PINS] ;
 static int range         [MAX_PINS] ;
@@ -81,14 +82,23 @@ static PI_THREAD (softPwmThread)
   {
     mark  = marks [pin] ;
     space = range [pin] - mark ;
-
+/*
+    struct timespec markT;
+    markT.tv_sec = 0;
+    markT.tv_nsec = mark * PULSE_TIME;
+    struct timespec spaceT;
+    spaceT.tv_sec = 0;
+    spaceT.tv_nsec = space * PULSE_TIME;
+*/
     if (mark != 0)
       digitalWrite (pin, HIGH) ;
-    delayMicroseconds (mark * 100) ;
+    //nanosleep(&markT, NULL);
+    delayMicroseconds (mark) ;
 
     if (space != 0)
       digitalWrite (pin, LOW) ;
-    delayMicroseconds (space * 100) ;
+    //nanosleep(&spaceT, NULL);
+    delayMicroseconds (space) ;
   }
 
   return NULL ;
